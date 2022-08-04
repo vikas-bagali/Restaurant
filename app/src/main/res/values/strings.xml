@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Restaurant</string>
+    <string name="search_hint">Search for Restaurant,item,cuisine</string>
+    <string name="restaurant">Restaurant</string>
+    <string name="starbucks">Starbucks</string>
+    <string name="search_results">Search Results</string>
+    <string name="no_result">Uh-Oh \n No Result found.Please try something else</string>
+</resources>

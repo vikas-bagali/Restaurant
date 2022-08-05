@@ -20,7 +20,10 @@ import com.demo.restaurant.adapter.SearchAdapter
 import com.demo.restaurant.databinding.ActivityMainBinding
 import com.demo.restaurant.model.RestaurantData
 import com.demo.restaurant.model.Restaurants
+import com.demo.restaurant.model.menuData.Categories
 import com.demo.restaurant.model.menuData.MenuData
+import com.demo.restaurant.model.menuData.MenuItems
+import com.demo.restaurant.model.menuData.Menus
 import com.demo.restaurant.utils.Helper
 import com.google.gson.Gson
 import java.io.IOException
@@ -105,11 +108,13 @@ class MainActivity : AppCompatActivity() {
     fun performSearch(keyword: String, pos: Int) {
         recyclerViewContainer.visibility = View.VISIBLE
         if (keyword.trim { it <= ' ' }.length > pos) {
+            val listFromMenu: ArrayList<Restaurants> = getRestaurantListBasedOnMenu(keyword)
             close.visibility = View.VISIBLE
             noResultFoundContainer.visibility = View.GONE
             val mList: ArrayList<Restaurants> = ArrayList()
             if (restaurantData != null) {
                 val arrayList: ArrayList<Restaurants> = restaurantData!!.restaurants
+                //val arrayList2: ArrayList<Menus> = menuData!!.menus
                 for (res: Restaurants in arrayList) {
                     if (res.name?.lowercase()
                             ?.contains(keyword.lowercase()) == true || res.cuisineType?.lowercase()
@@ -118,7 +123,10 @@ class MainActivity : AppCompatActivity() {
                         mList.add(res)
                     }
                 }
+
+
             }
+            mList.addAll(listFromMenu)
             Log.d("Test", "performSearch: after $mList")
             searchAdapter.updateSearchItems(mList)
         } else if (keyword.isEmpty()) {
@@ -126,6 +134,35 @@ class MainActivity : AppCompatActivity() {
             recyclerViewContainer.visibility = View.GONE
             //noResultFoundContainer.visibility = View.VISIBLE
         }
+    }
+
+    private fun getRestaurantListBasedOnMenu(keyword: String): ArrayList<Restaurants> {
+        val arrayList: ArrayList<Restaurants> = restaurantData!!.restaurants
+        val arrayList2: ArrayList<Menus> = menuData!!.menus
+        val restIdList: LinkedHashSet<Int> = LinkedHashSet()
+        val mList: ArrayList<Restaurants> = ArrayList()
+        for (menu: Menus in arrayList2) {
+            val categoriesList: ArrayList<Categories> = menu.categories
+            for (cat: Categories in categoriesList) {
+                val list: ArrayList<MenuItems> = cat.menuitems
+                for (item: MenuItems in list) {
+                    if (item.name?.lowercase()?.contains(keyword.lowercase()) == true) {
+                        menu.restaurantId?.let { restIdList.add(it) }
+                    }
+                }
+
+            }
+        }
+
+        for (res: Restaurants in arrayList) {
+
+            for (one: Int in restIdList) {
+                if (one == res.id) {
+                    mList.add(res)
+                }
+            }
+        }
+        return mList
     }
 
 
